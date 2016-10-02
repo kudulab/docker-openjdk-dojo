@@ -1,0 +1,10 @@
+FROM <%= config[:image] %>
+
+RUN git clone --depth 1 https://github.com/sstephenson/bats.git /opt/bats && \
+  git clone --depth 1 https://github.com/ztombol/bats-support.git /opt/bats-support && \
+  git clone --depth 1 https://github.com/ztombol/bats-assert.git /opt/bats-assert && \
+  /opt/bats/install.sh /usr/local
+
+# do not use the entrypoint set by docker image, so that we can properly test
+# if it fails
+ENTRYPOINT ["/bin/bash"]

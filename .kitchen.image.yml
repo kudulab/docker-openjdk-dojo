@@ -1,0 +1,29 @@
+---
+provisioner:
+  # no chef-client
+  name: dummy
+
+verifier:
+  name: shell
+  command: /usr/local/bin/bats /tmp/bats
+  remote_exec: true
+
+platforms:
+  - name: docker-image
+    transport:
+      name: docker_cli
+    driver:
+      name: docker_cli
+    driver_config:
+      dockerfile: KitchenDockerfile
+      command:  -c '/bin/bash'
+      image: <%= ENV['AIT_DOCKER_IMAGE_NAME'] %>:<%= ENV['AIT_DOCKER_IMAGE_TAG'] %>
+
+suites:
+  - name: configs
+    driver_config:
+      container_name: kt-ide-image
+      volume:
+        - <%= File.dirname(__FILE__) %>/test/integration/dummy_work:/ide/work
+        - <%= File.dirname(__FILE__) %>/test/integration/identities/full:/ide/identity
+        - <%= File.dirname(__FILE__) %>/test/integration/configs/bats:/tmp/bats
