@@ -33,6 +33,16 @@ context 'operations' do
       expect(output).to include('openjdk version "1.8')
       expect(exit_status).to eq 0
     end
+    it 'has correct environment variables set' do
+      cmd = "cd #{test_ide_work} && ide \"env | grep JAVA\""
+
+      output, exit_status = run_cmd(cmd)
+
+      expect(output).to include('JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk')
+      expect(output).to include('JAVA_VERSION=8u92')
+      expect(output).to include('JAVA_ALPINE_VERSION=8.92.14-r1')
+      expect(exit_status).to eq 0
+    end
     it 'has gradle installed and it is invocable' do
       cmd = "cd #{test_ide_work} && ide \"gradle --version\""
 

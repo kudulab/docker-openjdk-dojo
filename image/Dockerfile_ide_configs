@@ -15,5 +15,9 @@ COPY etc_ide.d/scripts/* /etc/ide.d/scripts/
 COPY etc_ide.d/variables/* /etc/ide.d/variables/
 COPY inputrc /etc/
 
+# we create here custom entrypoint
+COPY entrypoint.sh /usr/bin/entrypoint.sh
+RUN chmod 755 /usr/bin/entrypoint.sh
+
 ENTRYPOINT ["/sbin/tini", "-g", "--", "/usr/bin/entrypoint.sh"]
 CMD ["/bin/bash"]
