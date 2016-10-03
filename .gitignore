@@ -1,0 +1,16 @@
+**/.kitchen
+**/imagerc*
+**/*.html
+**/real_identity/**
+**/identities/real/**
+**/dummy_work/**
+**/test_ide_work/stc-*
+**/test_ide_work/*Idefile*
+
+ide/work/bats/
+bats-support/
+bats-assert/
+
+# do not ignore those
+!**/dummy_work/.placeholder
+*.png
