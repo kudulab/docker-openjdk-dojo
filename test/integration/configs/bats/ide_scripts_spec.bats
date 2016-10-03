@@ -55,7 +55,7 @@ load '/opt/bats-assert/load.bash'
   # do not test which line returns those strings, sometimes there is
   # additional line: "usermod: no changes"
   assert_line --partial "ide init finished"
-  assert_line --partial "using mono-ide:"
+  assert_line --partial "using java-ide:"
   assert_line "ide"
 }
 

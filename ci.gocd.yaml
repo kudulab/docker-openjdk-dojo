@@ -16,23 +16,26 @@ pipelines:
                 - small
               tasks:
                - exec:
-                   command: ide
-                   arguments:
+                  command: ide
+                  arguments:
                     - "bundle install && bundle exec rake go:git:destructive_validate_repo"
             repocritic:
               resources:
                 - docker
                 - small
               tasks:
-                - script: ide "bundle install && bundle exec rake style:repocritic"
+               - exec:
+                  command: ide
+                  arguments:
+                    - "bundle install && bundle exec rake style:repocritic"
             itest_configs:
               resources:
                 - docker
                 - small
               tasks:
                - exec:
-                   command: ide
-                   arguments:
+                  command: ide
+                  arguments:
                     - "bundle install && bundle exec rake build_configs_image && bundle exec rake test_ide_configs"
       - build:
           clean_workspace: true
@@ -47,8 +50,8 @@ pipelines:
                     destination:
               tasks:
                - exec:
-                   command: ide
-                   arguments:
+                  command: ide
+                  arguments:
                     - "bundle install && bundle exec rake build_configs_image && bundle exec rake build"
       - itest:
           clean_workspace: true
