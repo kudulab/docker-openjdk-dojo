@@ -36,13 +36,15 @@ else
 fi
 
 if [ -n "$this_image_name" ] || [ -n "$this_image_tag" ]; then
-  # variables set
-  echo -e "${GREEN}using ${this_image_name}:${this_image_tag}${NC}"
+	  # variables set
+	  echo -e "${GREEN}using ${this_image_name}:${this_image_tag}${NC}"
 fi
 
 # those are set by a base image, but when using ide, user may have overwritten
-# them, so set them again
-export JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
-export JAVA_VERSION=8u92
-export JAVA_ALPINE_VERSION=8.92.14-r1
+# them, so set them again:
+# https://github.com/docker-library/openjdk/blob/baaaf7714f9c66e4c5decf2c108a2738b7186c7f/8-jdk/Dockerfile
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_VERSION=8u102
+export JAVA_DEBIAN_VERSION=8u102-b14.1-1~bpo8+1
+export CA_CERTIFICATES_JAVA_VERSION=20140324
 sudo -E -H -u ide /bin/bash -lc "$@"

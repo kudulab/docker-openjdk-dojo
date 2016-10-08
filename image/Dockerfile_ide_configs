@@ -1,11 +1,21 @@
-FROM java:8u92-jdk-alpine
+FROM openjdk:8u102
+
+# Install Tini and verify its keys (both tini and tini.asc must be in the same
+# directory when verifying)
+ENV TINI_VERSION v0.9.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.asc /tini.asc
+RUN gpg --keyserver ha.pool.sks-keyservers.net --recv-keys 0527A9B7 \
+ && gpg --verify /tini.asc && mv /tini /usr/bin/tini && chmod +x /usr/bin/tini &&\
+ rm /tini.asc
 
 # For ide:
 # * entrypoint requires sudo and shadow
 # * git is needed to install ide image configs
-# * openssh is needed by `git clone git@...`
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
-  apk add --no-cache bash shadow sudo git openssh tini && \
+# * ca-certificated needed when running git clone to avoid this error:
+# fatal: unable to access 'https://github.com/ai-traders/ide.git/': Problem with the SSL CA cert (path? access rights?)
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends sudo git ca-certificates && \
   git clone --depth 1 -b 0.6.0 https://github.com/ai-traders/ide.git /tmp/ide_git && \
   /tmp/ide_git/ide_image_scripts/src/install.sh && \
   rm -r /tmp/ide_git && \
@@ -13,11 +23,10 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repos
 
 COPY etc_ide.d/scripts/* /etc/ide.d/scripts/
 COPY etc_ide.d/variables/* /etc/ide.d/variables/
-COPY inputrc /etc/
 
 # we create here custom entrypoint
 COPY entrypoint.sh /usr/bin/entrypoint.sh
 RUN chmod 755 /usr/bin/entrypoint.sh
 
-ENTRYPOINT ["/sbin/tini", "-g", "--", "/usr/bin/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini", "-g", "--", "/usr/bin/entrypoint.sh"]
 CMD ["/bin/bash"]

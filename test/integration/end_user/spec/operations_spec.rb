@@ -38,9 +38,9 @@ context 'operations' do
 
       output, exit_status = run_cmd(cmd)
 
-      expect(output).to include('JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk')
-      expect(output).to include('JAVA_VERSION=8u92')
-      expect(output).to include('JAVA_ALPINE_VERSION=8.92.14-r1')
+      expect(output).to include('JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64')
+      expect(output).to include('JAVA_VERSION=8u102')
+      expect(output).to include('JAVA_DEBIAN_VERSION=8u102-b14.1-1~bpo8+1')
       expect(exit_status).to eq 0
     end
     it 'has gradle installed and it is invocable' do

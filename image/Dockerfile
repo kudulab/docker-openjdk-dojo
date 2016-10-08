@@ -2,7 +2,7 @@ FROM ide_configs:temp
 
 ENV GRADLE_VERSION 3.1
 ENV GRADLE_HOME /usr/lib/gradle/gradle-${GRADLE_VERSION}
-RUN apk add --no-cache libstdc++ wget nano &&\
+RUN cd /tmp &&\
   wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip &&\
   unzip gradle-${GRADLE_VERSION}-bin.zip && mv gradle-${GRADLE_VERSION}/ /usr/lib/ &&\
   rm gradle-${GRADLE_VERSION}-bin.zip &&\
@@ -16,5 +16,5 @@ RUN cd /tmp/ &&\
   rm apache-maven-${MAVEN_VERSION}-bin.zip &&\
   ln -s /usr/lib/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/bin/mvn
 
-ENTRYPOINT ["/sbin/tini", "-g", "--", "/usr/bin/entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/tini", "-g", "--", "/usr/bin/entrypoint.sh"]
 CMD ["/bin/bash"]
