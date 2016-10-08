@@ -59,5 +59,13 @@ context 'operations' do
       expect(output).to include('Apache Maven 3.3.9')
       expect(exit_status).to eq 0
     end
+    it 'simple text editor is installed (nano)' do
+      cmd = "cd #{test_ide_work} && ide \"nano --version\""
+
+      output, exit_status = run_cmd(cmd)
+
+      expect(output).to include('GNU nano')
+      expect(exit_status).to eq 0
+    end
   end
 end

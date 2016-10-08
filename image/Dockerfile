@@ -1,5 +1,7 @@
 FROM ide_configs:temp
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nano
+
 ENV GRADLE_VERSION 3.1
 ENV GRADLE_HOME /usr/lib/gradle/gradle-${GRADLE_VERSION}
 RUN cd /tmp &&\
