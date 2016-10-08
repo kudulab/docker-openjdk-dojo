@@ -42,15 +42,21 @@ end
 # Returns stdout+stderr and exit status.
 def run_cmd(cmd)
   puts "running: #{cmd}".cyan
-  total_output = ''
-  _stdin, stdout, stderr, wait_thr = Open3.popen3(cmd)
-  stdout.each_line do |line|
-    puts line
-    total_output += line
+  Bundler.with_clean_env do
+    total_output = ''
+    exit_status = -1
+    # ::popen2e is similar to ::popen3 except that it merges the standard output
+    # stream and the standard error stream
+    Open3.popen2e(cmd) do |stdin, stdout_and_stderr, wait_thr|
+      # stdin must be closed or else, you'll get no line by line output and
+      # `docker run --rm` will hang with container in exited state
+      stdin.close
+      stdout_and_stderr.each_line do |line|
+        puts line
+        total_output += line
+      end
+      exit_status = wait_thr.value.exitstatus
+    end
+    return total_output, exit_status
   end
-  stderr.each_line do |line|
-    puts line
-    total_output += line
-  end
-  return total_output, wait_thr.value.exitstatus
 end

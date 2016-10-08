@@ -1,10 +1,11 @@
 # docker-java-ide
 
-An IDE docker image with Java tools. Based on java:8u92-jdk-alpine.
+An IDE docker image with Java tools. Based on openjdk:8u102.
 
 ## Specification
 This image has installed:
- * openjdk version "1.8.0_92-internal"
+ * openjdk version "1.8.0_102"
+ * OpenJDK Runtime Environment (build 1.8.0_102-8u102-b14.1-1~bpo8+1-b14)
  * Gradle 3.1
  * Apache Maven 3.3.9
 
@@ -12,7 +13,7 @@ This image has installed:
 1. Install [IDE](https://github.com/ai-traders/ide)
 2. Provide an Idefile:
 ```
-IDE_DOCKER_IMAGE="docker-registry.ai-traders.com/java-ide:0.1.0"
+IDE_DOCKER_IMAGE="docker-registry.ai-traders.com/java-ide:0.2.0"
 ```
 3. Run, example commands:
 ```bash
