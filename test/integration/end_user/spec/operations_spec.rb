@@ -48,7 +48,7 @@ context 'operations' do
 
       output, exit_status = run_cmd(cmd)
 
-      expect(output).to include('Gradle 3.1')
+      expect(output).to include('Gradle 2.14.1')
       expect(exit_status).to eq 0
     end
     it 'has maven installed and it is invocable' do
