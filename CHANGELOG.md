@@ -1,3 +1,7 @@
+### 0.3.1 (11 Oct 2016)
+
+* #9994 added warm up stage
+
 ### 0.3.0 (10 Oct 2016)
 
 * #10022 switch to gradle 2.14.1 due to unresolvable BOM importing problems

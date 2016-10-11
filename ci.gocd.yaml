@@ -119,3 +119,24 @@ pipelines:
                     command: ide
                     arguments:
                       - "bundle install && bundle exec rake publish:image"
+  docker-java-ide.warmup:
+    group: stcdev
+    label_template: "${git[:8]}"
+    materials:
+      git:
+        git: "git@git.ai-traders.com:stcdev/docker-java-ide.git"
+        branch: master
+    stages:
+      - warmup:
+          clean_workspace: true
+          jobs:
+            node-ide:
+              resources:
+                - docker
+                - small
+              tasks:
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - "-c"
+                      - "./warmup.sh docker-registry.ai-traders.com/java-ide"

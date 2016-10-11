@@ -13,7 +13,7 @@ This image has installed:
 1. Install [IDE](https://github.com/ai-traders/ide)
 2. Provide an Idefile:
 ```
-IDE_DOCKER_IMAGE="docker-registry.ai-traders.com/java-ide:0.2.0"
+IDE_DOCKER_IMAGE="docker-registry.ai-traders.com/java-ide:0.3.1_warm"
 ```
 3. Run, example commands:
 ```bash
