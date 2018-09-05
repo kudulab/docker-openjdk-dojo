@@ -17,7 +17,7 @@ load '/opt/bats-assert/load.bash'
 
 @test "has gradle installed and it is invocable" {
   run /bin/bash -c "ide --idefile Idefile.to_be_tested \"gradle --version\""
-  assert_output --partial 'Gradle 2.14.1'
+  assert_output --partial 'Gradle 4.10'
   assert_equal "$status" 0
 }
 

@@ -1,7 +1,12 @@
+### 0.4.0 (2018-Sep-05)
+
+ * upgrade to gradle 4.10
+
 ### 0.3.2 (2018-Sep-05)
 
  * updated base image
  * switch to build tools without ruby
+ * removed warmup, java projects are updated so rarely that it wasn't helping anyway
 
 ### 0.3.1 (11 Oct 2016)
 

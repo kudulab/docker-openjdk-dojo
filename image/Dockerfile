@@ -27,7 +27,7 @@ RUN chmod 755 /usr/bin/entrypoint.sh
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nano
 
-ENV GRADLE_VERSION 2.14.1
+ENV GRADLE_VERSION 4.10
 ENV GRADLE_HOME /usr/lib/gradle/gradle-${GRADLE_VERSION}
 RUN cd /tmp &&\
   wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip &&\

@@ -6,7 +6,7 @@ An IDE docker image with Java tools. Based on openjdk:8.
 This image has installed:
  * openjdk version "1.8"
  * OpenJDK Runtime Environment
- * Gradle 2.14.1
+ * Gradle 4.10
  * Apache Maven 3.3.9
 
 ## Usage
