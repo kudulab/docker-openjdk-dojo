@@ -42,9 +42,8 @@ fi
 
 # those are set by a base image, but when using ide, user may have overwritten
 # them, so set them again:
-# https://github.com/docker-library/openjdk/blob/baaaf7714f9c66e4c5decf2c108a2738b7186c7f/8-jdk/Dockerfile
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-export JAVA_VERSION=8u102
-export JAVA_DEBIAN_VERSION=8u102-b14.1-1~bpo8+1
-export CA_CERTIFICATES_JAVA_VERSION=20140324
+export JAVA_HOME=/docker-java-home
+export JAVA_VERSION=8u181
+export JAVA_DEBIAN_VERSION=8u181-b13-1~deb9u1
+export CA_CERTIFICATES_JAVA_VERSION=20170531+nmu1
 sudo -E -H -u ide /bin/bash -lc "$@"

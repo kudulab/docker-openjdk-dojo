@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -e
+if [[ ! -f ./releaser ]];then
+  wget --quiet http://http.archive.ai-traders.com/releaser/1.0.3/releaser
+fi
+source ./releaser
+if [[ ! -f ./docker-ops ]];then
+  wget --quiet http://http.archive.ai-traders.com/docker-ops/0.2.3/docker-ops
+fi
+source ./docker-ops
+# This goes as last in order to let end user variables override default values
+releaser_init
+
+image_name="docker-registry.ai-traders.com/java-ide"
+image_dir="./image"
+imagerc_filename="imagerc"
+
+command="$1"
+case "${command}" in
+  set_version)
+      if [[ -n "$2" ]]; then
+        next_version="$2"
+        set_version_in_changelog "${changelog_file}" "${next_version}"
+        set_next_oversion "${next_version}"
+      else
+        next_version=$(get_next_oversion)
+        set_version_in_changelog "${changelog_file}" "${next_version}"
+      fi
+      exit $?
+      ;;
+  verify_version)
+      verify_version_for_release
+      exit $?
+      ;;
+  build)
+      image_name_no_registry="${image_name/docker-registry.ai-traders.com\//}"
+      production_image_tag=$(get_last_version_from_changelog "${changelog_file}")
+      docker_build_options="--build-arg this_image_name_arg=${image_name_no_registry} --build-arg this_image_tag_arg=${production_image_tag}"
+      docker_build "${image_dir}" "${imagerc_filename}" "${image_name}" "$2"
+      exit $?
+      ;;
+  itest)
+      source_imagerc "${image_dir}"  "${imagerc_filename}"
+      echo "Testing image: ${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}"
+      # use the production ENTRYPOINT
+      echo "IDE_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Idefile.to_be_tested
+      # use real identity, it is needed to create vm in openstack
+      echo "IDE_WORK=$(pwd)/test/integration/test_ide_work" >> Idefile.to_be_tested
+      time bats "$(pwd)/test/integration/end_user/bats"
+      exit $?
+      ;;
+  example)
+      source_imagerc "${image_dir}"  "${imagerc_filename}"
+      echo "Testing image: ${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}"
+      # use the production ENTRYPOINT
+      echo "IDE_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Idefile.example
+      echo "IDE_DOCKER_OPTIONS=\"-v /etc/localtime:/etc/localtime\"" >> Idefile.example
+      # this uses real identity, but you can use mocked one with:
+      # echo "IDE_IDENTITY=\"$(pwd)/test/integration/identities/full\"" >> Idefile.example
+      echo "IDE_WORK=$(pwd)/test/integration/test_ide_work" >> Idefile.example
+      exit $?
+      ;;
+  release)
+      verify_version_for_release
+      git_tag_from_oversion
+      old_version=$(get_next_oversion)
+      next_version=$(bump_patch_version "${old_version}")
+      set_next_oversion "${next_version}"
+      exit $?
+      ;;
+  publish)
+      production_image_tag=$(get_last_version_from_changelog "${changelog_file}")
+      validate_version_is_semver "${production_image_tag}"
+      source_imagerc "${image_dir}" "${imagerc_filename}"
+      docker_push "${AIT_DOCKER_IMAGE_NAME}" "${AIT_DOCKER_IMAGE_TAG}" "${production_image_tag}"
+      exit $?
+      ;;
+  *)
+      echo "Invalid command: '${command}'"
+      exit 1
+      ;;
+esac
+set +e

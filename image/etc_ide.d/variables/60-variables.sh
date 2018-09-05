@@ -1,9 +1,8 @@
 #!/bin/bash
 
 ###########################################################################
-# A file to keep any bash variables. Used in development scripts and also
-# copied into ideide docker image.
+# A file to keep any bash variables.
 ###########################################################################
 
 export this_image_name="java-ide"
-export this_image_tag="IMAGE_VERSION"
+export this_image_tag="${this_image_tag}"

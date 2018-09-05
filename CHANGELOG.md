@@ -1,3 +1,8 @@
+### 0.3.2 (2018-Sep-05)
+
+ * updated base image
+ * switch to build tools without ruby
+
 ### 0.3.1 (11 Oct 2016)
 
 * #9994 added warm up stage

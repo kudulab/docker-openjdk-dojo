@@ -31,7 +31,7 @@ User git
 Port 2222
 IdentityFile ${ide_home}/.ssh/id_rsa
 
-Host gitlab.ai-traders.com
+Host gogs.ai-traders.com
 User git
 Port 2222
 IdentityFile ${ide_home}/.ssh/id_rsa

@@ -4,78 +4,35 @@ pipelines:
     label_template: "${git[:8]}"
     materials:
       git:
-        git: "git@git.ai-traders.com:stcdev/docker-java-ide.git"
-        branch: ci
+        type: configrepo
     stages:
-      - style_unit:
-          clean_workspace: true
-          jobs:
-            validate_repo:
-              resources:
-                - docker
-                - small
-              tasks:
-               - exec:
-                  command: ide
-                  arguments:
-                    - "bundle install && bundle exec rake go:git:destructive_validate_repo"
-            repocritic:
-              resources:
-                - docker
-                - small
-              tasks:
-               - exec:
-                  command: ide
-                  arguments:
-                    - "bundle install && bundle exec rake style:repocritic"
-            itest_configs:
-              resources:
-                - docker
-                - small
-              tasks:
-               - exec:
-                  command: ide
-                  arguments:
-                    - "bundle install && bundle exec rake build_configs_image && bundle exec rake test_ide_configs"
       - build:
           clean_workspace: true
           jobs:
             docker_image:
               resources:
-                - docker
-                - small
+                - docker_builder
               artifacts:
                 - build:
                     source: image/imagerc
                     destination:
               tasks:
-               - exec:
-                  command: ide
-                  arguments:
-                    - "bundle install && bundle exec rake build_configs_image && bundle exec rake build"
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ./tasks verify_version
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - -c
+                      - ops_docker_push=true ./tasks build
       - itest:
           clean_workspace: true
           jobs:
-            kitchen:
-              resources:
-                - docker
-                - small
-              tasks:
-                - fetch:
-                    stage: build
-                    job: docker_image
-                    is_file: yes
-                    source: imagerc
-                    destination: image/
-                # imagerc file is sourced by dockerimagerake
-                - exec:
-                    command: ide
-                    arguments:
-                      - "bundle install && bundle exec rake kitchen"
             end_user:
               resources:
-                - docker
-                - small
+                - docker_builder
               tasks:
                 - fetch:
                     stage: build
@@ -83,30 +40,31 @@ pipelines:
                     is_file: yes
                     source: imagerc
                     destination: image/
-                # imagerc file is sourced by dockerimagerake
                 - exec:
-                    command: ide
+                    command: /bin/bash
                     arguments:
-                      - "bundle install && bundle exec rake install_ide && bundle exec rake end_user"
+                      - -c
+                      - ./tasks itest
       - release:
           clean_workspace: true
           jobs:
             code:
+              # this could run on elastic go agent, but since all the jobs
+              # are run here on docker_builder, let's run this job there too
               resources:
-                - docker
-                - small
+                - docker_builder
               tasks:
                 - exec:
-                    command: ide
+                    command: /bin/bash
                     arguments:
-                      - "bundle install && bundle exec rake release:code"
+                      - -c
+                      - ./tasks release
       - publish:
           clean_workspace: true
           jobs:
             docker_image:
               resources:
-                - docker
-                - small
+                - docker_builder
               tasks:
                 - fetch:
                     stage: build
@@ -114,29 +72,8 @@ pipelines:
                     is_file: yes
                     source: imagerc
                     destination: image/
-                # imagerc file is sourced by dockerimagerake
-                - exec:
-                    command: ide
-                    arguments:
-                      - "bundle install && bundle exec rake publish:image"
-  docker-java-ide.warmup:
-    group: stcdev
-    label_template: "${git[:8]}"
-    materials:
-      git:
-        git: "git@git.ai-traders.com:stcdev/docker-java-ide.git"
-        branch: master
-    stages:
-      - warmup:
-          clean_workspace: true
-          jobs:
-            node-ide:
-              resources:
-                - docker
-                - small
-              tasks:
                 - exec:
                     command: /bin/bash
                     arguments:
-                      - "-c"
-                      - "./warmup.sh docker-registry.ai-traders.com/java-ide"
+                      - -c
+                      - ./tasks publish
