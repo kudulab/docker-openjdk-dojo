@@ -14,6 +14,13 @@ if [ ! -f "${ide_identity}/.ssh/id_rsa" ]; then
   echo "${ide_identity}/.ssh/id_rsa does not exist"
   exit 1;
 fi
+if [ ! -f "${ide_identity}/.vault-token" ]; then
+  echo "${ide_identity}/.vault-token does not exist. You won't be able to access vault."
+else
+  cp ${ide_identity}/.vault-token ${ide_home}/.vault-token
+  chown ide:ide ${ide_home}/.vault-token
+  chmod 0600 ${ide_home}/.vault-token
+fi
 cp -r "${ide_identity}/.ssh" "${ide_home}"
 for id_rsa_file in "${ide_home}/.ssh/"*"id_rsa"; do
   chown ide:ide "${id_rsa_file}"

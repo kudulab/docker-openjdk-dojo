@@ -18,6 +18,9 @@ RUN apt-get update && \
   rm -r /tmp/ide_git && \
   echo 'ide ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
+COPY ./ca.crt /usr/local/share/ca-certificates/ait.crt
+RUN update-ca-certificates
+
 COPY etc_ide.d/scripts/* /etc/ide.d/scripts/
 COPY etc_ide.d/variables/* /etc/ide.d/variables/
 
@@ -42,6 +45,16 @@ RUN cd /tmp/ &&\
   mv apache-maven-${MAVEN_VERSION} /usr/lib/ &&\
   rm apache-maven-${MAVEN_VERSION}-bin.zip &&\
   ln -s /usr/lib/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/bin/mvn
+
+RUN cd tmp &&\
+  wget https://releases.hashicorp.com/vault/0.10.1/vault_0.10.1_linux_amd64.zip -O /tmp/vault.zip &&\
+  unzip /tmp/vault.zip &&\
+  cp /tmp/vault /usr/local/bin/vault &&\
+  chmod +x /usr/local/bin/vault &&\
+  rm -rf /tmp/vault*
+
+ADD http://os2.ai-traders.com:6780/swift/v1/secret-ops/0.3.1/setup-kube /usr/bin/setup-kube
+RUN chmod 0755 /usr/bin/setup-kube
 
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--", "/usr/bin/entrypoint.sh"]

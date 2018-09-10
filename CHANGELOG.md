@@ -1,3 +1,7 @@
+### 0.5.0 (2018-Sep-10)
+
+ * added optional k8s secrets setup on container start
+
 ### 0.4.0 (2018-Sep-05)
 
  * upgrade to gradle 4.10
