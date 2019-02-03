@@ -1,3 +1,5 @@
+### 0.6.0 (2019-Feb-03)
+
 * transform from ide docker image to dojo docker image #17139
 * no need for custom entrypoint - set java variables in etc/dojo.d/variables/
 * pretty bash prompt
