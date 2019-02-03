@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
-# This script is expected to be run outside ide docker image, because
-# it will invoke ide command-line.
-# Invoke this after ide docker image was published with pretty tag like 0.1.0.
+# This script is expected to be run outside dojo docker image, because
+# it will invoke dojo command-line.
+# Invoke this after dojo docker image was published with pretty tag like 0.1.0.
 
 docker_image_name="$1"
 if [ -z "$docker_image_name" ]; then
@@ -21,21 +21,21 @@ if [ ! -d "$warmup_dir" ]; then
   echo "warmup_dir: ${warmup_dir} does not exist"
   exit 1
 fi
-idefile="${warmup_dir}/Idefile"
-# generate Idefile, otherwise Idefile would contain bash variables and we
+dojofile="${warmup_dir}/Dojofile"
+# generate Dojofile, otherwise Dojofile would contain bash variables and we
 # want it to be just key=value data
-echo -e "IDE_DRIVER=docker" > "${idefile}"
-echo -e "IDE_DOCKER_IMAGE=\"${base_image}\"" >> "${idefile}"
-echo -e "IDE_DOCKER_OPTIONS=\"-v ${warmup_dir}/warmup.sh:/tmp/warmup.sh\"" >> "${idefile}"
+echo -e "DOJO_DRIVER=docker" > "${dojofile}"
+echo -e "DOJO_DOCKER_IMAGE=\"${base_image}\"" >> "${dojofile}"
+echo -e "DOJO_DOCKER_OPTIONS=\"-v ${warmup_dir}/warmup.sh:/tmp/warmup.sh\"" >> "${dojofile}"
 
-cd "${warmup_dir}" && ide --no_rm /tmp/warmup.sh
-if [ -f "${warmup_dir}/iderc.txt" ]; then
-  container_name=$(cat "${warmup_dir}/iderc.txt")
-elif [ -f "${warmup_dir}/iderc" ]; then
-  # TODO: in the future, after IDE 6.0.0, we should source iderc if iderc.txt does not exist
-  container_name=$(cat "${warmup_dir}/iderc")
+cd "${warmup_dir}" && dojo --rm=false /tmp/warmup.sh
+if [ -f "${warmup_dir}/dojorc.txt" ]; then
+  container_name=$(cat "${warmup_dir}/dojorc.txt")
+elif [ -f "${warmup_dir}/dojorc" ]; then
+  # TODO: in the future, after IDE 6.0.0, we should source dojorc if dojorc.txt does not exist
+  container_name=$(cat "${warmup_dir}/dojorc")
 else
-  echo "neither ${warmup_dir}/iderc nor ${warmup_dir}/iderc.txt exist. Cannot tell docker container name."
+  echo "neither ${warmup_dir}/dojorc nor ${warmup_dir}/dojorc.txt exist. Cannot tell docker container name."
   exit 1
 fi
 # https://aitraders.tpondemand.com/entity/9928

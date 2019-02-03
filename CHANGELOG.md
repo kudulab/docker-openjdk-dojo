@@ -1,3 +1,6 @@
+* transform from ide docker image to dojo docker image #17139
+* no need for custom entrypoint - set java variables in etc/dojo.d/variables/
+
 ### 0.5.0 (2018-Sep-10)
 
  * added optional k8s secrets setup on container start

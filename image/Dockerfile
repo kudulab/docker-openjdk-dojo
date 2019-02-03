@@ -5,28 +5,24 @@ COPY apt_01proxy /etc/apt/apt.conf.d/01_proxy
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 
-# For ide:
+# For Dojo:
 # * entrypoint requires sudo and shadow
-# * git is needed to install ide image configs
+# * git is needed to install image configs
 # * ca-certificated needed when running git clone to avoid this error:
-# fatal: unable to access 'https://github.com/ai-traders/ide.git/': Problem with the SSL CA cert (path? access rights?)
+# fatal: unable to access 'https://github.com/ai-traders/dojo.git/': Problem with the SSL CA cert (path? access rights?)
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   sudo git ca-certificates wget && \
-  git clone --depth 1 -b 0.9.0 https://github.com/ai-traders/ide.git /tmp/ide_git && \
-  /tmp/ide_git/ide_image_scripts/src/install.sh && \
-  rm -r /tmp/ide_git && \
-  echo 'ide ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+  git clone --depth 1 -b 0.2.1 https://github.com/ai-traders/dojo.git /tmp/dojo_git &&\
+  /tmp/dojo_git/image_scripts/src/install.sh && \
+  rm -r /tmp/dojo_git && \
+  echo 'dojo ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 COPY ./ca.crt /usr/local/share/ca-certificates/ait.crt
 RUN update-ca-certificates
 
-COPY etc_ide.d/scripts/* /etc/ide.d/scripts/
-COPY etc_ide.d/variables/* /etc/ide.d/variables/
-
-# we create here custom entrypoint
-COPY entrypoint.sh /usr/bin/entrypoint.sh
-RUN chmod 755 /usr/bin/entrypoint.sh
+COPY etc_dojo.d/scripts/* /etc/dojo.d/scripts/
+COPY etc_dojo.d/variables/* /etc/dojo.d/variables/
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nano
 

@@ -44,9 +44,9 @@ case "${command}" in
       source_imagerc "${image_dir}"  "${imagerc_filename}"
       echo "Testing image: ${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}"
       # use the production ENTRYPOINT
-      echo "IDE_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Idefile.to_be_tested
+      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Dojofile.to_be_tested
       # use real identity, it is needed to create vm in openstack
-      echo "IDE_WORK=$(pwd)/test/integration/test_ide_work" >> Idefile.to_be_tested
+      echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> Dojofile.to_be_tested
       time bats "$(pwd)/test/integration/end_user/bats"
       exit $?
       ;;
@@ -54,11 +54,11 @@ case "${command}" in
       source_imagerc "${image_dir}"  "${imagerc_filename}"
       echo "Testing image: ${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}"
       # use the production ENTRYPOINT
-      echo "IDE_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Idefile.example
-      echo "IDE_DOCKER_OPTIONS=\"-v /etc/localtime:/etc/localtime\"" >> Idefile.example
+      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Dojofile.example
+      echo "DOJO_DOCKER_OPTIONS=\"-v /etc/localtime:/etc/localtime\"" >> Dojofile.example
       # this uses real identity, but you can use mocked one with:
-      # echo "IDE_IDENTITY=\"$(pwd)/test/integration/identities/full\"" >> Idefile.example
-      echo "IDE_WORK=$(pwd)/test/integration/test_ide_work" >> Idefile.example
+      # echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> Dojofile.example
+      echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> Dojofile.example
       exit $?
       ;;
   release)

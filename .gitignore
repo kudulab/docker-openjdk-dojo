@@ -4,10 +4,10 @@
 **/real_identity/**
 **/identities/real/**
 **/dummy_work/**
-**/test_ide_work/stc-*
-**/test_ide_work/*Idefile*
+**/test_dojo_work/stc-*
+**/test_dojo_work/*Dojofile*
 
-ide/work/bats/
+dojo/work/bats/
 bats-support/
 bats-assert/
 
@@ -16,4 +16,4 @@ bats-assert/
 *.png
 /docker-ops
 /releaser
-/Idefile.to_be_tested
+/Dojofile.to_be_tested

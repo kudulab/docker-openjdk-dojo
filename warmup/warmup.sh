@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script is expected to be run in the ide docker image as ide
+# This script is expected to be run in the dojo docker image as dojo
 # linux user with all needed configs and secrets mounted.
 
 git_repos=( "git@gitlab.ai-traders.com:gpd/api-gpd-server.git" )
@@ -28,7 +28,7 @@ for git_repo in "${git_repos[@]}"; do
 done
 
 # remove secrets after warmup
-rm -rf /home/ide/.ssh/*
-rm -rf /home/ide/.gitconfig
+rm -rf /home/dojo/.ssh/*
+rm -rf /home/dojo/.gitconfig
 
 exit 0
