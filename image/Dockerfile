@@ -55,7 +55,3 @@ RUN chmod 0755 /usr/bin/setup-kube
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--", "/usr/bin/entrypoint.sh"]
 CMD ["/bin/bash"]
-
-ARG this_image_tag_arg
-ARG this_image_name_arg
-ENV this_image_tag=${this_image_tag_arg} this_image_name=${this_image_name_arg}

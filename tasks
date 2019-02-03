@@ -34,9 +34,6 @@ case "${command}" in
       exit $?
       ;;
   build)
-      image_name_no_registry="${image_name/docker-registry.ai-traders.com\//}"
-      production_image_tag=$(get_last_version_from_changelog "${changelog_file}")
-      docker_build_options="--build-arg this_image_name_arg=${image_name_no_registry} --build-arg this_image_tag_arg=${production_image_tag}"
       docker_build "${image_dir}" "${imagerc_filename}" "${image_name}" "$2"
       exit $?
       ;;
