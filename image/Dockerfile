@@ -21,9 +21,6 @@ RUN apt-get update && \
 COPY ./ca.crt /usr/local/share/ca-certificates/ait.crt
 RUN update-ca-certificates
 
-COPY etc_dojo.d/scripts/* /etc/dojo.d/scripts/
-COPY etc_dojo.d/variables/* /etc/dojo.d/variables/
-
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nano
 
 ENV GRADLE_VERSION 4.10
@@ -51,6 +48,13 @@ RUN cd tmp &&\
 
 ADD http://os2.ai-traders.com:6780/swift/v1/secret-ops/0.3.1/setup-kube /usr/bin/setup-kube
 RUN chmod 0755 /usr/bin/setup-kube
+
+COPY etc_dojo.d/scripts/* /etc/dojo.d/scripts/
+COPY etc_dojo.d/variables/* /etc/dojo.d/variables/
+
+COPY profile /home/dojo/.profile
+COPY bashrc /home/dojo/.bashrc
+RUN chown dojo:dojo /home/dojo/.profile /home/dojo/.bashrc
 
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--", "/usr/bin/entrypoint.sh"]

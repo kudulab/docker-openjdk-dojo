@@ -48,10 +48,3 @@ IdentityFile ${dojo_home}/.ssh/id_rsa
 if [ -f "${dojo_identity}/.gitconfig" ]; then
   cp "${dojo_identity}/.gitconfig" "${dojo_home}"
 fi
-
-# Not obligatory file; in order to ensure that after bash login, the dojo user
-# is in /dojo/work. Not obligatory but shortens end user's commands.
-# Do not copy it from $dojo_identity, because it may reference sth not installed in
-# this docker image.
-touch "${dojo_home}/.profile"
-echo "cd ${dojo_work}" > "${dojo_home}/.profile"
