@@ -1,6 +1,7 @@
 * transform from ide docker image to dojo docker image #17139
 * no need for custom entrypoint - set java variables in etc/dojo.d/variables/
 * pretty bash prompt
+* releaser 1.1.0, docker-ops 0.3.3
 
 ### 0.5.0 (2018-Sep-10)
 

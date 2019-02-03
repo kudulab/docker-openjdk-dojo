@@ -1,18 +1,21 @@
 #!/bin/bash
 
 set -e
-if [[ ! -f ./releaser ]];then
-  wget --quiet http://http.archive.ai-traders.com/releaser/1.0.3/releaser
+if [[ ! -f ./releaser ]]; then
+  wget --quiet http://http.archive.ai-traders.com/releaser/1.1.0/releaser || { echo "Cannot download releaser, ignoring."; }
 fi
-source ./releaser
-if [[ ! -f ./docker-ops ]];then
-  wget --quiet http://http.archive.ai-traders.com/docker-ops/0.2.3/docker-ops
+if [[ -f ./releaser ]]; then
+  source ./releaser
 fi
-source ./docker-ops
-# This goes as last in order to let end user variables override default values
-releaser_init
+if [[ ! -f ./docker-ops ]]; then
+  wget --quiet http://http.archive.ai-traders.com/docker-ops/0.3.3/docker-ops || { echo "Cannot download docker-ops, ignoring."; }
+fi
+if [[ -f ./docker-ops ]]; then
+  source ./docker-ops
+fi
 
-image_name="docker-registry.ai-traders.com/java-ide"
+image_name="java-ide"
+image_registry="docker-registry.ai-traders.com"
 image_dir="./image"
 imagerc_filename="imagerc"
 
@@ -21,56 +24,59 @@ case "${command}" in
   set_version)
       if [[ -n "$2" ]]; then
         next_version="$2"
-        set_version_in_changelog "${changelog_file}" "${next_version}"
-        set_next_oversion "${next_version}"
+        releaser::set_version_in_changelog "${changelog_file}" "${next_version}"
+        releaser::set_next_oversion "${next_version}"
       else
-        next_version=$(get_next_oversion)
-        set_version_in_changelog "${changelog_file}" "${next_version}"
+        next_version=$(releaser::get_next_oversion)
+        releaser::set_version_in_changelog "${changelog_file}" "${next_version}"
       fi
       exit $?
       ;;
   verify_version)
-      verify_version_for_release
+      releaser::verify_version_for_release
       exit $?
       ;;
   build)
-      docker_build "${image_dir}" "${imagerc_filename}" "${image_name}" "$2"
+      image_tag=$(git rev-parse HEAD)
+      ( set -x; cd "${image_dir}"; docker build -t "${image_name}:${image_tag}" .; )
+      docker_ops::create_imagerc "${image_dir}" "${imagerc_filename}" "${image_name}" "${image_tag}" "${image_registry}"
+      docker_ops::push_tmp "${image_name}" "${image_tag}" "${image_registry}"
       exit $?
       ;;
   itest)
-      source_imagerc "${image_dir}"  "${imagerc_filename}"
-      echo "Testing image: ${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}"
+      docker_ops::source_imagerc "${image_dir}" "${imagerc_filename}"
+      echo "Testing image: ${AIT_DOCKER_IMAGE_URL}"
       # use the production ENTRYPOINT
-      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Dojofile.to_be_tested
+      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_URL}\"" > Dojofile.to_be_tested
       # use real identity, it is needed to create vm in openstack
       echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> Dojofile.to_be_tested
       time bats "$(pwd)/test/integration/end_user/bats"
       exit $?
       ;;
   example)
-      source_imagerc "${image_dir}"  "${imagerc_filename}"
-      echo "Testing image: ${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}"
+      docker_ops::source_imagerc "${image_dir}" "${imagerc_filename}"
+      echo "Testing image: ${AIT_DOCKER_IMAGE_URL}"
       # use the production ENTRYPOINT
-      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_NAME}:${AIT_DOCKER_IMAGE_TAG}\"" > Dojofile.example
+      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_URL}\"" > Dojofile.example
       echo "DOJO_DOCKER_OPTIONS=\"-v /etc/localtime:/etc/localtime\"" >> Dojofile.example
       # this uses real identity, but you can use mocked one with:
       # echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> Dojofile.example
       echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> Dojofile.example
+      dojo -c Dojofile.example
       exit $?
       ;;
   release)
-      verify_version_for_release
-      git_tag_from_oversion
-      old_version=$(get_next_oversion)
-      next_version=$(bump_patch_version "${old_version}")
-      set_next_oversion "${next_version}"
+      releaser::verify_version_for_release
+      releaser::git_tag_from_oversion
+      old_version=$(releaser::get_next_oversion)
+      next_version=$(releaser::bump_patch_version "${old_version}")
+      releaser::set_next_oversion "${next_version}"
       exit $?
       ;;
   publish)
-      production_image_tag=$(get_last_version_from_changelog "${changelog_file}")
-      validate_version_is_semver "${production_image_tag}"
-      source_imagerc "${image_dir}" "${imagerc_filename}"
-      docker_push "${AIT_DOCKER_IMAGE_NAME}" "${AIT_DOCKER_IMAGE_TAG}" "${production_image_tag}"
+      version=$(releaser::get_last_version_from_whole_changelog "${changelog_file}")
+      releaser::validate_version_is_semver "${version}"
+      docker_ops::push_production "${image_dir}"  "${imagerc_filename}" "${image_name}" "${version}" "${image_registry}"
       exit $?
       ;;
   *)

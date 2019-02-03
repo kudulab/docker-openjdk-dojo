@@ -14,6 +14,7 @@ bats-assert/
 # do not ignore those
 !**/dummy_work/.placeholder
 *.png
-/docker-ops
-/releaser
-/Dojofile.to_be_tested
+docker-ops
+releaser
+Dojofile.to_be_tested
+Dojofile.example
