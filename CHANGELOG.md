@@ -1,3 +1,7 @@
+### 1.0.1 (2019-Apr-28)
+
+* fix handling empty `.ssh` directory
+
 ### 1.0.0 (2019-Apr-28)
 
 Making a public image.

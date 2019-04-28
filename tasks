@@ -66,7 +66,12 @@ case "${command}" in
       echo "DOJO_DOCKER_IMAGE=\"${KUDU_DOCKER_IMAGE_URL}\"" > ./Dojofile.to_be_tested
       echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> ./Dojofile.to_be_tested
       echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> ./Dojofile.to_be_tested
-      time bats "$(pwd)/test/integration/end_user/bats"
+      time bats "$(pwd)/test/integration/full/bats"
+
+      echo "DOJO_DOCKER_IMAGE=\"${KUDU_DOCKER_IMAGE_URL}\"" > ./Dojofile.to_be_tested
+      echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/empty\"" >> ./Dojofile.to_be_tested
+      echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> ./Dojofile.to_be_tested
+      time bats "$(pwd)/test/integration/empty/bats"
       ;;
   example)
       docker_ops::ensure_pulled_image "${image_dir}" "${imagerc_filename}"
