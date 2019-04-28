@@ -10,8 +10,8 @@ load '/opt/bats-assert/load.bash'
 @test "has correct environment variables set" {
   run /bin/bash -c "dojo -c Dojofile.to_be_tested \"env | grep JAVA\""
   assert_output --partial 'JAVA_HOME=/docker-java-home'
-  assert_output --partial 'JAVA_VERSION=8u181'
-  assert_output --partial 'JAVA_DEBIAN_VERSION=8u181-b13-1~deb9u1'
+  assert_output --partial 'JAVA_VERSION=8u212'
+  assert_output --partial 'JAVA_DEBIAN_VERSION=8u212-b01-1~deb9u1'
   assert_equal "$status" 0
 }
 

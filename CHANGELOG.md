@@ -1,3 +1,18 @@
+### 1.0.0 (2019-Apr-28)
+
+Making a public image.
+ * rename to `openjdk-dojo`
+ * publish to dockerhub under `kudulab/openjdk-dojo`
+ * shorter identity setup, all secrets are optional
+ * use public scripts from kudulab
+ * removed oversion
+ * removed AIT CA
+ * remove AIT APT proxy config
+ * removed vault cli from image
+ * removed sudo privileges
+ * updated base image to `openjdk:8u212`
+ * removed `CA_CERTIFICATES_JAVA_VERSION` variable, it is no longer present in the base image
+
 ### 0.6.0 (2019-Feb-03)
 
 * transform from ide docker image to dojo docker image #17139

@@ -1,87 +1,100 @@
 #!/bin/bash
 
-set -e
-if [[ ! -f ./releaser ]]; then
-  wget --quiet http://http.archive.ai-traders.com/releaser/1.1.0/releaser || { echo "Cannot download releaser, ignoring."; }
-fi
-if [[ -f ./releaser ]]; then
-  source ./releaser
-fi
-if [[ ! -f ./docker-ops ]]; then
-  wget --quiet http://http.archive.ai-traders.com/docker-ops/0.3.3/docker-ops || { echo "Cannot download docker-ops, ignoring."; }
-fi
-if [[ -f ./docker-ops ]]; then
-  source ./docker-ops
-fi
+set -Eeuo pipefail
 
-image_name="java-ide"
-image_registry="docker-registry.ai-traders.com"
+RELEASER_VERSION="2.1.0"
+DOCKER_OPS_VERSION="2.0.0"
+SECRET_OPS_VERSION="0.6.1"
+
+SECRET_OPS_FILE="ops/secret-ops"
+SECRET_OPS_TAR_FILE="ops/secret-ops-${SECRET_OPS_VERSION}.tar.gz"
+RELEASER_FILE="ops/releaser-${RELEASER_VERSION}"
+DOCKER_OPS_FILE="ops/docker-ops-${DOCKER_OPS_VERSION}"
+
+mkdir -p ops
+if [[ ! -f $RELEASER_FILE ]];then
+  wget --quiet -O $RELEASER_FILE https://github.com/kudulab/releaser/releases/download/${RELEASER_VERSION}/releaser
+fi
+source $RELEASER_FILE
+if [[ ! -f $DOCKER_OPS_FILE ]];then
+  wget --quiet -O $DOCKER_OPS_FILE https://github.com/kudulab/docker-ops/releases/download/${DOCKER_OPS_VERSION}/docker-ops
+fi
+source $DOCKER_OPS_FILE
+if [[ ! -f $SECRET_OPS_TAR_FILE ]];then
+  wget --quiet -O $SECRET_OPS_TAR_FILE https://github.com/kudulab/secret-ops/releases/download/${SECRET_OPS_VERSION}/secret-ops.tar.gz
+  tar -xf $SECRET_OPS_TAR_FILE -C ops
+fi
+source $SECRET_OPS_FILE
+
+image_name="kudulab/openjdk-dojo"
+image_registry="dockerhub"
 image_dir="./image"
 imagerc_filename="imagerc"
 
+function docker_login {
+  vault_user_path=$USER
+  if [ $vault_user_path == "go" ]; then
+    vault_user_path="gocd"
+  fi
+  dockerhub_user=$(vault read -field=user secret/$vault_user_path/dockerhub)
+  vault read -field=password secret/$vault_user_path/dockerhub | docker login --username $dockerhub_user --password-stdin
+}
+
 command="$1"
+set +u
 case "${command}" in
   set_version)
-      if [[ -n "$2" ]]; then
-        next_version="$2"
-        releaser::set_version_in_changelog "${changelog_file}" "${next_version}"
-        releaser::set_next_oversion "${next_version}"
-      else
-        next_version=$(releaser::get_next_oversion)
-        releaser::set_version_in_changelog "${changelog_file}" "${next_version}"
-      fi
-      exit $?
+      set +u
+      releaser::bump_changelog_version "$2" "$3"
       ;;
   verify_version)
-      releaser::verify_version_for_release
-      exit $?
+      releaser::verify_release_ready
+      ;;
+  build_local)
+      image_tag=$(git rev-parse HEAD)
+      # build image and push to a test registry
+      docker_ops::docker_build "${image_dir}" "${imagerc_filename}" "${image_name}" "${image_tag}" "${image_registry}"
       ;;
   build)
-      image_tag=$(git rev-parse HEAD)
-      ( set -x; cd "${image_dir}"; docker build -t "${image_name}:${image_tag}" .; )
-      docker_ops::create_imagerc "${image_dir}" "${imagerc_filename}" "${image_name}" "${image_tag}" "${image_registry}"
-      docker_ops::push_tmp "${image_name}" "${image_tag}" "${image_registry}"
-      exit $?
+      docker_login
+      ./tasks build_local
+      docker_ops::push "${image_dir}" "${imagerc_filename}"
       ;;
   itest)
-      docker_ops::source_imagerc "${image_dir}" "${imagerc_filename}"
-      echo "Testing image: ${AIT_DOCKER_IMAGE_URL}"
-      # use the production ENTRYPOINT
-      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_URL}\"" > Dojofile.to_be_tested
-      # use real identity, it is needed to create vm in openstack
-      echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> Dojofile.to_be_tested
+      docker_ops::ensure_pulled_image "${image_dir}" "${imagerc_filename}"
+      echo "Testing image: ${KUDU_DOCKER_IMAGE_URL}"
+      echo "DOJO_DOCKER_IMAGE=\"${KUDU_DOCKER_IMAGE_URL}\"" > ./Dojofile.to_be_tested
+      echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> ./Dojofile.to_be_tested
+      echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> ./Dojofile.to_be_tested
       time bats "$(pwd)/test/integration/end_user/bats"
-      exit $?
       ;;
   example)
-      docker_ops::source_imagerc "${image_dir}" "${imagerc_filename}"
-      echo "Testing image: ${AIT_DOCKER_IMAGE_URL}"
-      # use the production ENTRYPOINT
-      echo "DOJO_DOCKER_IMAGE=\"${AIT_DOCKER_IMAGE_URL}\"" > Dojofile.example
-      echo "DOJO_DOCKER_OPTIONS=\"-v /etc/localtime:/etc/localtime\"" >> Dojofile.example
-      # this uses real identity, but you can use mocked one with:
-      # echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> Dojofile.example
-      echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> Dojofile.example
-      dojo -c Dojofile.example
-      exit $?
+      docker_ops::ensure_pulled_image "${image_dir}" "${imagerc_filename}"
+      echo "Testing image: ${KUDU_DOCKER_IMAGE_URL}"
+      echo "DOJO_DOCKER_IMAGE=\"${KUDU_DOCKER_IMAGE_URL}\"" > ./Dojofile.example
+      echo "DOJO_IDENTITY_OUTER=\"$(pwd)/test/integration/identities/full\"" >> ./Dojofile.example
+      echo "DOJO_WORK_OUTER=$(pwd)/test/integration/test_dojo_work" >> ./Dojofile.example
+      dojo -c ./Dojofile.example
       ;;
   release)
-      releaser::verify_version_for_release
-      releaser::git_tag_from_oversion
-      old_version=$(releaser::get_next_oversion)
-      next_version=$(releaser::bump_patch_version "${old_version}")
-      releaser::set_next_oversion "${next_version}"
-      exit $?
+      ./tasks verify_version
+      version=$(releaser::get_last_version_from_whole_changelog "${changelog_file}")
+      git tag "${version}" && git push origin "${version}"
       ;;
   publish)
+      docker_login
       version=$(releaser::get_last_version_from_whole_changelog "${changelog_file}")
-      releaser::validate_version_is_semver "${version}"
-      docker_ops::push_production "${image_dir}"  "${imagerc_filename}" "${image_name}" "${version}" "${image_registry}"
-      exit $?
+      docker_ops::ensure_pulled_image "${image_dir}" "${imagerc_filename}"
+      docker_ops::retag_push "${image_dir}"  "${imagerc_filename}" "${image_name}" "${version}" "${image_registry}"
+      ;;
+  generate_vault_token)
+      vault_token=$(vault token create -ttl=48h -policy=gocd -field token -metadata gocd_renew=true)
+      secured_token_gocd=$(secret_ops::encrypt_with_gocd_top "${vault_token}")
+      echo "Generated token: ${vault_token} and encrypted by GoCD server"
+      secret_ops::insert_vault_token_gocd_yaml "${secured_token_gocd}"
       ;;
   *)
       echo "Invalid command: '${command}'"
       exit 1
       ;;
 esac
-set +e

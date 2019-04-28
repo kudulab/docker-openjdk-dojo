@@ -1,6 +1,6 @@
-# docker-java-ide
+# docker-openjdk-dojo
 
-A Dojo docker image with Java tools. Based on openjdk:8.
+A [Dojo](https://github.com/ai-traders/dojo) docker image with Java build tools. Based on openjdk:8.
 
 ## Specification
 This image has installed:
@@ -11,11 +11,15 @@ This image has installed:
 
 ## Usage
 1. Install [Dojo](https://github.com/ai-traders/dojo)
-2. Provide an Dojofile:
+```bash
+DOJO_VERSION=0.4.0
+wget -O dojo https://github.com/ai-traders/dojo/releases/download/${DOJO_VERSION}/dojo_linux_amd64
+sudo mv dojo /usr/local/bin
+sudo chmod +x /usr/local/bin/dojo
 ```
-# if you need k8s access configuration in ~/.kube, then export name of the k8s user in AIT_GPD_K8S_USER
-export AIT_GPD_K8S_USER=gpd-testing
-DOJO_DOCKER_IMAGE="docker-registry.ai-traders.com/java-ide:0.5.0"
+2. Provide a Dojofile:
+```
+DOJO_DOCKER_IMAGE="kudulab/openjdk-dojo:1.0.0"
 ```
 3. Run, example commands:
 ```bash
@@ -26,13 +30,16 @@ dojo mvn --version
 
 By default, current directory in docker container is `/dojo/work`.
 
+For a real-world usage see these projects:
+ * [gocd-yaml-config-plugin](https://github.com/tomzo/gocd-yaml-config-plugin)
+ * [gocd-json-config-plugin](https://github.com/tomzo/gocd-json-config-plugin)
 
 ### Configuration
-Those files are used:
 
-1. `~/.ssh/config` -- will be generated on docker container start
-2. `~/.ssh/id_rsa` -- it must exist locally, because it is a secret
- (but the whole `~/.ssh` will be copied)
+These files are used inside the docker image:
+
+1. `~/.ssh/` -- is copied from host to dojo's home `~/.ssh`
+1. `~/.ssh/config` -- will be generated on docker container start. SSH client is configured to ignore known ssh hosts.
 2. `~/.gitconfig` -- if exists locally, will be copied
 3. `~/.profile` -- will be generated on docker container start, in
-   order to ensure current directory is `/dojo/work`.
+  order to ensure current directory is `/dojo/work`.

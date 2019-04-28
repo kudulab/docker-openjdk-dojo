@@ -6,7 +6,7 @@
 **/dummy_work/**
 **/test_dojo_work/stc-*
 **/test_dojo_work/*Dojofile*
-
+/ops/
 dojo/work/bats/
 bats-support/
 bats-assert/
