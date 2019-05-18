@@ -1,3 +1,6 @@
+### 1.1.0 (2019-May-18)
+ * upgraded gradle to 5.4.1
+
 ### 1.0.1 (2019-Apr-28)
 
 * fix handling empty `.ssh` directory
