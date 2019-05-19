@@ -11,6 +11,8 @@ SECRET_OPS_TAR_FILE="ops/secret-ops-${SECRET_OPS_VERSION}.tar.gz"
 RELEASER_FILE="ops/releaser-${RELEASER_VERSION}"
 DOCKER_OPS_FILE="ops/docker-ops-${DOCKER_OPS_VERSION}"
 
+VAULT_ADDR="https://vault.kudulab.io:8200"
+
 mkdir -p ops
 if [[ ! -f $RELEASER_FILE ]];then
   wget --quiet -O $RELEASER_FILE https://github.com/kudulab/releaser/releases/download/${RELEASER_VERSION}/releaser
@@ -93,7 +95,7 @@ case "${command}" in
       docker_ops::retag_push "${image_dir}"  "${imagerc_filename}" "${image_name}" "${version}" "${image_registry}"
       ;;
   generate_vault_token)
-      vault_token=$(vault token create -ttl=48h -policy=gocd -field token -metadata gocd_renew=true)
+      vault_token=$(vault token create -orphan -ttl=48h -policy=gocd -field token -metadata gocd_renew=true)
       secured_token_gocd=$(secret_ops::encrypt_with_gocd_top "${vault_token}")
       echo "Generated token: ${vault_token} and encrypted by GoCD server"
       secret_ops::insert_vault_token_gocd_yaml "${secured_token_gocd}"
