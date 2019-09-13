@@ -1,3 +1,6 @@
+### 1.2.0 (2019-Sep-13)
+Fixes to support OSX.
+
 ### 1.1.0 (2019-May-18)
  * upgraded gradle to 5.4.1
 

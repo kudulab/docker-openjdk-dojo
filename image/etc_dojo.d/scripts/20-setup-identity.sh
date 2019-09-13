@@ -24,3 +24,5 @@ UserKnownHostsFile /dev/null
 if [ -f "${dojo_identity}/.gitconfig" ]; then
   cp "${dojo_identity}/.gitconfig" "${dojo_home}"
 fi
+
+chown dojo:dojo ${dojo_home} ${dojo_home}/.ssh
