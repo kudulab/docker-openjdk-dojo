@@ -1,3 +1,6 @@
+### 1.3.0 (2019-Oct-14)
+Added lein to support clojure
+
 ### 1.2.0 (2019-Sep-13)
 Fixes to support OSX.
 

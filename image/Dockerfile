@@ -29,6 +29,9 @@ RUN cd /tmp/ &&\
   rm apache-maven-${MAVEN_VERSION}-bin.zip &&\
   ln -s /usr/lib/apache-maven-${MAVEN_VERSION}/bin/mvn /usr/bin/mvn
 
+ADD https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein /usr/bin/lein
+RUN chmod -c 0755 /usr/bin/lein
+
 COPY etc_dojo.d/scripts/* /etc/dojo.d/scripts/
 COPY etc_dojo.d/variables/* /etc/dojo.d/variables/
 

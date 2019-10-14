@@ -25,3 +25,9 @@ load '/opt/bats-assert/load.bash'
   assert_output --partial 'Apache Maven 3.3.9'
   assert_equal "$status" 0
 }
+
+@test "has lein installed and it is invocable" {
+  run /bin/bash -c "dojo -c Dojofile.to_be_tested \"lein --version\""
+  assert_output --partial 'lein'
+  assert_equal "$status" 0
+}
