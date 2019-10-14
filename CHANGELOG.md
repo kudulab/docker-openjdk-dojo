@@ -1,3 +1,6 @@
+### 1.3.1 (2019-Oct-14)
+Added Make
+
 ### 1.3.0 (2019-Oct-14)
 Added lein to support clojure
 
