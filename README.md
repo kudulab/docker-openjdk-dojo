@@ -1,25 +1,33 @@
 # docker-openjdk-dojo
 
-A [Dojo](https://github.com/ai-traders/dojo) docker image with Java build tools. Based on openjdk:8.
+A [Dojo](https://github.com/kudulab/dojo) docker image with Java build tools. Based on `openjdk:16-jdk-buster`.
 
 ## Specification
 This image has installed:
- * openjdk version "1.8"
+ * openjdk version 16
  * OpenJDK Runtime Environment
- * Gradle 4.10
+ * Gradle 6.5.1
  * Apache Maven 3.3.9
 
 ## Usage
-1. Install [Dojo](https://github.com/ai-traders/dojo)
-```bash
-DOJO_VERSION=0.4.0
-wget -O dojo https://github.com/ai-traders/dojo/releases/download/${DOJO_VERSION}/dojo_linux_amd64
-sudo mv dojo /usr/local/bin
-sudo chmod +x /usr/local/bin/dojo
+1. Install [Dojo](https://github.com/kudulab/dojo)
+On OSX, you can install with homebrew:
+```
+brew install kudulab/homebrew-dojo-osx/dojo
+```
+A manual install is another option:
+```sh
+version="0.9.0"
+# on Linux:
+wget -O /tmp/dojo https://github.com/kudulab/dojo/releases/download/${version}/dojo_linux_amd64
+# or on Darwin:
+# wget -O /tmp/dojo https://github.com/kudulab/dojo/releases/download/${version}/dojo_darwin_amd64
+chmod +x /tmp/dojo
+mv /tmp/dojo /usr/bin/dojo
 ```
 2. Provide a Dojofile:
 ```
-DOJO_DOCKER_IMAGE="kudulab/openjdk-dojo:1.0.0"
+DOJO_DOCKER_IMAGE="kudulab/openjdk-dojo:1.4.0"
 ```
 3. Run, example commands:
 ```bash
@@ -46,7 +54,7 @@ These files are used inside the docker image:
 
 ## License
 
-Copyright 2019 Ewa Czechowska, Tomasz Sętkowski
+Copyright 2020 Ewa Czechowska, Tomasz Sętkowski
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -1,3 +1,7 @@
+### 1.4.0 (2020-Aug-23)
+Upgraded gradle to 6.5.1
+Upgraded jdk to 16
+
 ### 1.3.1 (2019-Oct-14)
 Added Make
 
