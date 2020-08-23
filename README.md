@@ -4,7 +4,7 @@ A [Dojo](https://github.com/kudulab/dojo) docker image with Java build tools. Ba
 
 ## Specification
 This image has installed:
- * openjdk version 1
+ * openjdk version 14
  * OpenJDK Runtime Environment
  * Gradle 6.5.1
  * Apache Maven 3.3.9
