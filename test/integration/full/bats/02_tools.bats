@@ -3,14 +3,14 @@ load '/opt/bats-assert/load.bash'
 
 @test "has java installed and it is invocable" {
   run /bin/bash -c "dojo -c Dojofile.to_be_tested \"java -version\""
-  assert_output --partial 'openjdk version "16-ea'
+  assert_output --partial '14.0.2'
   assert_equal "$status" 0
 }
 
 @test "has correct environment variables set" {
   run /bin/bash -c "dojo -c Dojofile.to_be_tested \"env | grep JAVA\""
-  assert_output --partial 'JAVA_HOME=/usr/local/openjdk-16'
-  assert_output --partial 'JAVA_VERSION=16-ea+12'
+  assert_output --partial 'JAVA_HOME=/usr/local/openjdk-14'
+  assert_output --partial 'JAVA_VERSION=14.0.2'
   assert_equal "$status" 0
 }
 
