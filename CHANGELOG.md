@@ -1,3 +1,7 @@
+### 1.4.1 (2020-Dec-09)
+
+Use Dojo image scripts 0.10.3 to fix running on Mac
+
 ### 1.4.0 (2020-Aug-23)
 Upgraded gradle to 6.5.1
 Upgraded jdk to 14
