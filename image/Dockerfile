@@ -7,7 +7,7 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
   sudo git ca-certificates wget make && \
-  git clone --depth 1 -b 0.9.0 https://github.com/kudulab/dojo.git /tmp/dojo_git &&\
+  git clone --depth 1 -b 0.10.3 https://github.com/kudulab/dojo.git /tmp/dojo_git &&\
   /tmp/dojo_git/image_scripts/src/install.sh && \
   rm -r /tmp/dojo_git
 
