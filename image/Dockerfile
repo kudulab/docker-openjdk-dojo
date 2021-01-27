@@ -1,4 +1,4 @@
-FROM openjdk:14-jdk-buster
+FROM openjdk:15-jdk-buster
 
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
@@ -13,7 +13,7 @@ RUN apt-get update && \
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nano
 
-ENV GRADLE_VERSION 6.5.1
+ENV GRADLE_VERSION 6.8.1
 ENV GRADLE_HOME /usr/lib/gradle/gradle-${GRADLE_VERSION}
 RUN cd /tmp &&\
   wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip &&\
