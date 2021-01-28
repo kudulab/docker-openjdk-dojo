@@ -1,12 +1,12 @@
 # docker-openjdk-dojo
 
-A [Dojo](https://github.com/kudulab/dojo) docker image with Java build tools. Based on `openjdk:14-jdk-buster`.
+A [Dojo](https://github.com/kudulab/dojo) docker image with Java build tools. Based on `openjdk:15-jdk-buster`.
 
 ## Specification
 This image has installed:
- * openjdk version 14
+ * openjdk version 15
  * OpenJDK Runtime Environment
- * Gradle 6.5.1
+ * Gradle 6.8.1
  * Apache Maven 3.3.9
 
 ## Usage
